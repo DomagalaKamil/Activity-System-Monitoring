@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activity Monitor</title>
+    <script>
+        async function fetchUsers() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/users');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const users = await response.json();
+                console.log("Fetched users:", users);
+                const userSelect = document.getElementById('user');
+                userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.user;
+                    option.text = user.user;
+                    userSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        }
+
+        async function fetchActivities() {
+            try {
+                const user = document.getElementById('user').value;
+                if (!user) {
+                    alert("Please select a user");
+                    return;
+                }
+                const response = await fetch(`http://127.0.0.1:5000/activities?user=${user}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const activities = await response.json();
+                console.log("Fetched activities:", activities);
+                const activityTable = document.getElementById('activityTable');
+                activityTable.innerHTML = '';
+                activities.forEach(activity => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${activity.user}</td>
+                        <td>${activity.device}</td>
+                        <td>${activity.activity_type}</td>
+                        <td>${activity.details}</td>
+                        <td>${activity.timestamp}</td>
+                    `;
+                    activityTable.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching activities:", error);
+            }
+        }
+
+        window.onload = fetchUsers;
+    </script>
+</head>
+<body>
+    <h1>User Activity Monitor</h1>
+    <div>
+        <label for="user">User:</label>
+        <select id="user" name="user">
+            <option value="" disabled selected>Select User</option>
+        </select>
+        <button onclick="fetchActivities()">Fetch Activities</button>
+    </div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Device</th>
+                <th>Activity Type</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="activityTable"></tbody>
+    </table>
+</body>
+</html>
