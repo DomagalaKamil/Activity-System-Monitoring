@@ -5,16 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Activity Monitor</title>
     <script>
+        // Function to fetch the list of users from the backend
         async function fetchUsers() {
             try {
+                // Send a GET request to the backend to fetch users
                 const response = await fetch('http://127.0.0.1:5000/users');
                 if (!response.ok) {
+                    // Throw an error if the response is not OK
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
+                // Parse the response as JSON
                 const users = await response.json();
-                console.log("Fetched users:", users);
+                console.log("Fetched users:", users);  // Log fetched users for debugging
                 const userSelect = document.getElementById('user');
+                // Reset the user dropdown menu
                 userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
+                // Populate the dropdown menu with the fetched users
                 users.forEach(user => {
                     const option = document.createElement('option');
                     option.value = user.user;
@@ -22,25 +28,34 @@
                     userSelect.appendChild(option);
                 });
             } catch (error) {
+                // Log any errors that occur during the fetch
                 console.error("Error fetching users:", error);
             }
         }
 
+        // Function to fetch the activities for the selected user from the backend
         async function fetchActivities() {
             try {
+                // Get the selected user from the dropdown menu
                 const user = document.getElementById('user').value;
                 if (!user) {
+                    // Alert the user if no user is selected
                     alert("Please select a user");
                     return;
                 }
+                // Send a GET request to the backend to fetch activities for the selected user
                 const response = await fetch(`http://127.0.0.1:5000/activities?user=${user}`);
                 if (!response.ok) {
+                    // Throw an error if the response is not OK
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
+                // Parse the response as JSON
                 const activities = await response.json();
-                console.log("Fetched activities:", activities);
+                console.log("Fetched activities:", activities);  // Log fetched activities for debugging
                 const activityTable = document.getElementById('activityTable');
+                // Clear the activity table
                 activityTable.innerHTML = '';
+                // Populate the activity table with the fetched activities
                 activities.forEach(activity => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -53,10 +68,12 @@
                     activityTable.appendChild(row);
                 });
             } catch (error) {
+                // Log any errors that occur during the fetch
                 console.error("Error fetching activities:", error);
             }
         }
 
+        // Fetch the list of users when the page loads
         window.onload = fetchUsers;
     </script>
 </head>
